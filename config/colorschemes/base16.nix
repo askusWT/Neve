@@ -4,10 +4,12 @@
     base16.enable = lib.mkEnableOption "Enable base16 module";
   };
 
-  config = {
-    colorschemes.base16 = {
-      enable = true;
-      colorscheme = "mountain";
+  config = lib.mkIf config.base16.enable {
+    colorschemes = {
+      base16 = {
+       enable = true;
+       colorscheme = "mountain";
+       };
     };
   };
 }
