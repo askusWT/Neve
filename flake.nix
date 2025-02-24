@@ -1,74 +1,44 @@
 {
-  description = "Neve is a Neovim configuration built with Nixvim, which allows you to use Nix language to manage Neovim plugins/options";
+  description = "Neve is a Neovim configuration built with Nixvim, enabling Nix-based plugin management.";
 
   inputs = {
     nixvim.url = "github:nix-community/nixvim";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs =
-    {
-      self,
-      nixpkgs,
-      nixvim,
-      flake-utils,
-      ...
-    }@inputs:
+  outputs = { self, nixpkgs, nixvim, flake-utils, ... }@inputs:
     let
-      config = import ./config; # import the module directly
-      # Enable unfree packages
-      nixpkgsConfig = {
-        allowUnfree = true;
-      };
+      config = import ./config;  # Neovim module configuration
+      nixpkgsConfig = { allowUnfree = true; };
     in
-   let
-     # 1. Helper function to create Home Manager modules
-     mkHMModule = moduleFn: {
-       home-manager.neovimModules.default = moduleFn;
-     };
-   in
-   {
-     # 2. Keep existing nixvimModule output (for nix build/run)
-     nixvimModule = config;
+    {
+      # ✅ Home Manager module export (fixes previous issue)
+      homeManagerModules.default = config;
 
-     # 3. Expose homeManagerModules.default output (for Home Manager import)
-     homeManagerModules.default = mkHMModule config;
-   };
-   /*
-   flake-utils.lib.eachDefaultSystem (
-     system:
-     let
-       nixvimLib = nixvim.lib.${system};
-       pkgs = import nixpkgs {
-         inherit system;
-         config = nixpkgsConfig;
-       };
-       nixvim' = nixvim.legacyPackages.${system};
-       nvim = nixvim'.makeNixvimWithModule {
-         inherit pkgs;
-         module = config;
-         # You can use `extraSpecialArgs` to pass additional arguments to your module files
-         extraSpecialArgs = {
-           inherit self;
-         };
-       };
-     in
-     {
-       checks = {
-         # Run `nix flake check .` to verify that your config is not broken
-         default = nixvimLib.check.mkTestDerivationFromNvim {
-           inherit nvim;
-           name = "Neve";
-         };
-       };
+      # ✅ Nixvim module export (for NixOS & flake builds)
+      nixvimModule = config;
 
-       packages = {
-         # Lets you run `nix run .` to start nixvim
-         default = nvim;
-         };
+      # ✅ System-wide outputs for `nix build` and `nix run`
+      packages = flake-utils.lib.eachDefaultSystem (system:
+        let
+          pkgs = import nixpkgs { inherit system; config = nixpkgsConfig; };
+          nixvim' = nixvim.legacyPackages.${system};
+          nvim = nixvim'.makeNixvimWithModule {
+            inherit pkgs;
+            module = config;
+            extraSpecialArgs = { inherit self; };
+          };
+        in
+        {
+          checks.default = nixvim.lib.${system}.check.mkTestDerivationFromNvim {
+            inherit nvim;
+            name = "Neve";
+          };
 
-       formatter = pkgs.nixfmt-rfc-style;
-       }
-     );
-     */
- }
+          packages.default = nvim;
+
+          formatter = pkgs.nixfmt-rfc-style;
+        }
+      );
+    }
+}
