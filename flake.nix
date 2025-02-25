@@ -31,9 +31,6 @@
 
         formatter = pkgs.nixfmt-rfc-style;
 
-        #  New: Home Manager Module (Only Addition)
-        homeManagerModules.default = config;
-
         nixvimModule = config;
       }
     );
