@@ -6,10 +6,10 @@
   config = lib.mkIf config.none-ls-nvim.enable {
     plugins.none-ls = {
       enable = true;
+      enableLspFormat = true;
       settings = {
-        enableLspFormat = false;
-        updateInInsert = false;
-        onAttach = ''
+        update_in_insert = false;
+        on_attach = ''
           function(client, bufnr)
               if client.supports_method "textDocument/formatting" then
                 vim.api.nvim_clear_autocmds { group = augroup, buffer = bufnr }
@@ -39,10 +39,10 @@
         };
         formatting = {
           alejandra = {
-            enable = false;
+            enable = true;
           };
           nixfmt = {
-            enable = true;
+            enable = false;
           };
           prettier = {
             enable = true;
@@ -69,16 +69,16 @@
         };
       };
     };
-    # keymaps = [
-    #   {
-    #     mode = [ "n" "v" ];
-    #     key = "<leader>cf";
-    #     action = "<cmd>lua vim.lsp.buf.format()<cr>";
-    #     options = {
-    #       silent = true;
-    #       desc = "Format";
-    #     };
-    #   }
-    # ];
+     keymaps = [
+       {
+         mode = [ "n" "v" ];
+         key = "<leader>cf";
+         action = "<cmd>lua vim.lsp.buf.format()<cr>";
+         options = {
+           silent = true;
+           desc = "Format";
+         };
+       }
+     ];
   };
 }
