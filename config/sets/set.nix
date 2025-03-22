@@ -68,7 +68,7 @@
       signcolumn = "yes";
 
       # Enable cursor line highlight
-      cursorline = false; # Highlight the line where the cursor is located
+      cursorline = true; # Highlight the line where the cursor is located
 
       # Set fold settings
       # These options were reccommended by nvim-ufo
@@ -86,7 +86,7 @@
       # Place a column line
       colorcolumn = "80";
 
-      # Reduce which-key timeout 
+      # Reduce which-key timeout
       timeoutlen = 200;
 
       # Set encoding type
@@ -123,7 +123,7 @@
 
       inccommand = "split"; # (https://neovim.io/doc/user/options.html#'inccommand')
     };
-
+    clipboard.register = "unnamedplus";
     extraConfigLua = ''
       local opt = vim.opt
       local g = vim.g
